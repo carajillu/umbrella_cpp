@@ -51,7 +51,7 @@ float metropolis(float metro_input[2]){
   //  cout << metro;
    // cout << '\n';
     
-    if (metro<R)
+    if (metro>R)
     {
      return 1;//Accepted
     }
@@ -152,7 +152,7 @@ float MonteCarlo (float initial_values[6]){
 int main() {
     
     srand (19121988); // initialize random seed
-    float perturbSize=0.05;
+    float perturbSize=0.5; //actually we can use even larger steps
   
     float x0=4.;
     float U0=potential(x0);
