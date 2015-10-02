@@ -35,7 +35,8 @@ OBJECTDIR=${CND_BUILDDIR}/${CND_CONF}/${CND_PLATFORM}
 
 # Object Files
 OBJECTFILES= \
-	${OBJECTDIR}/monteCarlo.o
+	${OBJECTDIR}/monteCarlo.o \
+	${OBJECTDIR}/umbrellaSampling.o
 
 
 # C Compiler Flags
@@ -66,6 +67,11 @@ ${OBJECTDIR}/monteCarlo.o: monteCarlo.cpp
 	${MKDIR} -p ${OBJECTDIR}
 	${RM} "$@.d"
 	$(COMPILE.cc) -g -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/monteCarlo.o monteCarlo.cpp
+
+${OBJECTDIR}/umbrellaSampling.o: umbrellaSampling.cpp 
+	${MKDIR} -p ${OBJECTDIR}
+	${RM} "$@.d"
+	$(COMPILE.cc) -g -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/umbrellaSampling.o umbrellaSampling.cpp
 
 # Subprojects
 .build-subprojects:

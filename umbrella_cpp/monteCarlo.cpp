@@ -12,40 +12,47 @@
 
 using namespace std;
 
-float kT=50.; //Yes, by now I'll' leave it here
+double kT=10.; //Yes, by now I'll' leave it here
 
-float RandomFloat (float lower, float upper){
-    float random1=rand();
-    float randmax=RAND_MAX;
-    float random=(upper-lower)*(random1/randmax)+lower;
+double RandomFloat (double lower, double upper){
+    double random1=rand();
+    double randmax=RAND_MAX;
+    double random=(upper-lower)*(random1/randmax)+lower;
     return random;
 }
 
-float potential(float x){
-    float U=pow((x-2.),4)-6.*pow((x-2.),2)+2.*(x-2.);
+double potential(double x){
+    double U=pow((x-2.),4)-6.*pow((x-2.),2)+2.*(x-2.);
     return U;
 }
-float RandomPerturbation(float x0, float perturbSize){
-    float x=x0+perturbSize*RandomFloat(-1,1);
+
+double force_numeric(double x, double x0,double U,double U0){
+    double f=-((U-U0)/(x-x0));
+    return f;
+    // something is wrong here, because it doesn't approximate U-U0
+}
+
+double RandomPerturbation(double x0, double perturbSize){
+    double x=x0+perturbSize*RandomFloat(-1,1);
     return x;
 }
 
-float PositivePerturbation(float x0, float perturbSize){
-    float x=x0+perturbSize;
+double PositivePerturbation(double x0, double perturbSize){
+    double x=x0+perturbSize*RandomFloat(0,1);
     return x;
 }
 
-float NegativePerturbation(float x0, float perturbSize){
-    float x=x0-perturbSize;
+double NegativePerturbation(double x0, double perturbSize){
+    double x=x0-perturbSize*RandomFloat(0,1);
     return x;
 }
 
-float metropolis(float metro_input[2]){
+double metropolis(double metro_input[2]){
     
-    float U=metro_input[0];
-    float U0=metro_input[1];
-    float metro=exp(-((U-U0)/kT));
-    float R=RandomFloat(0,1);
+    double U=metro_input[0];
+    double U0=metro_input[1];
+    double metro=exp(-((U-U0)/kT));
+    double R=RandomFloat(0,1);
     
    // cout << "metropolis ";
   //  cout << metro;
@@ -61,47 +68,57 @@ float metropolis(float metro_input[2]){
     }
 }
 
-float MonteCarlo2 (float initial_values[6]){
-    float x0=initial_values[0];
-    float U0=initial_values[1];
+double MonteCarlo_maxSteps (double initial_values[6]){
+    double x0=initial_values[0];
+    double U0=initial_values[1];
     int acceptedSteps=initial_values[2];
     int totalSteps=initial_values[3];
     int maxSteps=initial_values[4];
-    float perturbSize=initial_values[5];
+    double perturbSize=initial_values[5];
+    
+    double work_n=U0;
+    double f=0;
     
     for (int i=1; i<maxSteps; i++)
     {
+        totalSteps++;
         double x=RandomPerturbation(x0,perturbSize);
         double U=potential(x);
         if (U<U0)
         {
          acceptedSteps++;
+         f=force_numeric(x,x0,U,U0);
+         work_n=work_n+f;
+         cout <<x<<' '<<U<<' '<<f<<' '<<work_n<<'\n';
          x0=x;
          U0=U;
         }
         else
         {
-          float metro_input[2]={U,U0};
+          double metro_input[2]={U,U0};
             int metro_output=metropolis(metro_input);
             if (metro_output==1)
             {
                 acceptedSteps=acceptedSteps+1;
+                f=force_numeric(x,x0,U,U0);
+                work_n=work_n+f;
+                cout <<x<<' '<<U<<' '<<f<<' '<<work_n<<'\n';
                 x0=x;
                 U0=U;
             }    
         }
-        cout << x0 <<' '<< U0<<' '<< acceptedSteps<<'\n';
+        //cout <<x0<<' '<<U0<<' '<<acceptedSteps<< ' '<<totalSteps<<'\n';
     }
 }
-
-float MonteCarlo (float initial_values[6]){
+/*
+double MonteCarlo_rec (double initial_values[6]){
     
-    float x0=initial_values[0];
-    float U0=initial_values[1];
+    double x0=initial_values[0];
+    double U0=initial_values[1];
     int acceptedSteps=initial_values[2];
     int totalSteps=initial_values[3];
     int maxSteps=initial_values[4];
-    float perturbSize=initial_values[5];
+    double perturbSize=initial_values[5];
     cout << x0;
     cout << ' ';
     cout << U0;
@@ -114,29 +131,29 @@ float MonteCarlo (float initial_values[6]){
     if (totalSteps<maxSteps)
     {
         totalSteps=totalSteps+1;
-        float x=RandomPerturbation(x0,perturbSize);
-        float U=potential(x);
+        double x=RandomPerturbation(x0,perturbSize);
+        double U=potential(x);
         if (U<=U0)
         {
             acceptedSteps=acceptedSteps+1;
-            //float results[4]={x, U, acceptedSteps, totalSteps};
-            float initial_values[6]={x,U,acceptedSteps,totalSteps,maxSteps,perturbSize};
+            //double results[4]={x, U, acceptedSteps, totalSteps};
+            double initial_values[6]={x,U,acceptedSteps,totalSteps,maxSteps,perturbSize};
             MonteCarlo(initial_values);
         }
         else
         {
-            float metro_input[2]={U,U0};
+            double metro_input[2]={U,U0};
             int metro_output=metropolis(metro_input);
             if (metro_output==1)
             {
                 acceptedSteps=acceptedSteps+1;
-                //float results[4]={x, U, acceptedSteps, totalSteps};
-                float initial_values[6]={x,U,acceptedSteps,totalSteps,maxSteps,perturbSize};
+                //double results[4]={x, U, acceptedSteps, totalSteps};
+                double initial_values[6]={x,U,acceptedSteps,totalSteps,maxSteps,perturbSize};
                 MonteCarlo(initial_values);
             }
             else
             { 
-                float initial_values[6]={x0,U0,acceptedSteps,totalSteps,maxSteps,perturbSize};
+                double initial_values[6]={x0,U0,acceptedSteps,totalSteps,maxSteps,perturbSize};
                 MonteCarlo(initial_values);
             }
         }
@@ -147,30 +164,23 @@ float MonteCarlo (float initial_values[6]){
         return 0;
     }
 }
-
+*/
 
 int main() {
     
     srand (19121988); // initialize random seed
-    float perturbSize=0.5; //actually we can use even larger steps
+    double perturbSize=0.005; //actually we can use even larger steps
   
-    float x0=4.;
-    float U0=potential(x0);
+    double x0=3.64;
+    double U0=potential(x0);
     int acceptedSteps=0;
     int totalSteps=0;
-    int maxSteps=50000;
-    
-
-//    double coor = -1.0;
-//    for (int i = 0; i<115; i++)
-//    {
-//        cout <<coor<<" "<<potential(coor)<<endl;
-//        coor+=0.05;
-//    }
-    
+    int maxSteps=1000;  
   
-    float initial_values[6]={x0,U0,acceptedSteps,totalSteps,maxSteps,perturbSize};
-    MonteCarlo2(initial_values);
+    double initial_values[6]={x0,U0,acceptedSteps,totalSteps,maxSteps,perturbSize};
+    MonteCarlo_maxSteps(initial_values);
+    
+    
     return 0;
 }
 
