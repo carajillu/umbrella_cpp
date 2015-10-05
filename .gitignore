@@ -26,3 +26,5 @@
 *.exe
 *.out
 *.app
+/umbrella_cpp/build/
+/umbrella_cpp/dist/
