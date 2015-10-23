@@ -13,6 +13,13 @@
 #include <vector>
 #include <sstream>
 
+#ifdef _OPENMP
+   #include <omp.h>
+#else
+   #define omp_get_num_threads() 1
+   #define omp_get_thread_num() 0
+#endif
+
 using namespace std;
 
 double kT=2;
@@ -95,12 +102,22 @@ int main() {
     int nWin=50;
     double spacing=0.1;
     
-    for (int winum=0;winum<nWin+1;winum++)
-    {
-     string windowName=winame(winum);
-     x0=x0+spacing;
-     window(x0,nSteps,perturbSize,k,windowName);
-    }
+    #pragma omp parallel
+    { //into parallel environment
+    
+       int nthreads=omp_get_num_threads();
+       cout<<"Detected "<<nthreads<<" openMP threads";      
+ 
+       #pragma omp for  // run for loop in parallel
+       for (int winum=0;winum<nWin+1;winum++)
+       {
+        int thread_id=omp_get_thread_num();
+        string windowName=winame(winum);
+        cout << "running window "<<windowName<<" in thread "<<thread_id<<"\n";
+        x0=x0+spacing;
+        window(x0,nSteps,perturbSize,k,windowName);
+       } 
+    } // out of parallel environment
     
     return 0;
 }

@@ -35,8 +35,10 @@ OBJECTDIR=${CND_BUILDDIR}/${CND_CONF}/${CND_PLATFORM}
 
 # Object Files
 OBJECTFILES= \
+	${OBJECTDIR}/hello_world_mp.o \
 	${OBJECTDIR}/monteCarlo.o \
-	${OBJECTDIR}/umbrellaSampling.o
+	${OBJECTDIR}/umbrellaSampling.o \
+	${OBJECTDIR}/wham.o
 
 
 # C Compiler Flags
@@ -63,6 +65,11 @@ ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/umbrella_cpp: ${OBJECTFILES}
 	${MKDIR} -p ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}
 	${LINK.cc} -o ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/umbrella_cpp ${OBJECTFILES} ${LDLIBSOPTIONS}
 
+${OBJECTDIR}/hello_world_mp.o: hello_world_mp.cpp 
+	${MKDIR} -p ${OBJECTDIR}
+	${RM} "$@.d"
+	$(COMPILE.c) -O2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/hello_world_mp.o hello_world_mp.cpp
+
 ${OBJECTDIR}/monteCarlo.o: monteCarlo.cpp 
 	${MKDIR} -p ${OBJECTDIR}
 	${RM} "$@.d"
@@ -72,6 +79,11 @@ ${OBJECTDIR}/umbrellaSampling.o: umbrellaSampling.cpp
 	${MKDIR} -p ${OBJECTDIR}
 	${RM} "$@.d"
 	$(COMPILE.cc) -O2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/umbrellaSampling.o umbrellaSampling.cpp
+
+${OBJECTDIR}/wham.o: wham.cpp 
+	${MKDIR} -p ${OBJECTDIR}
+	${RM} "$@.d"
+	$(COMPILE.cc) -O2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/wham.o wham.cpp
 
 # Subprojects
 .build-subprojects:
